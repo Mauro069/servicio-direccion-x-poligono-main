@@ -5,48 +5,56 @@ const polygons = require('../data/polygons.json')
 
 const searchArea = async (req, res) => {
   try {
-    const { address } = req.query
-    console.log(req.query)
+    const {  lat, lon } = req.query
 
     const pointPolygon = [
       [
-        [-60.804608260353874, -32.92886121438853],
-        [-60.80451170083326, -32.93136462652991],
-        [-60.80322424057656, -32.932958488723976],
-        [-60.801357423215705, -32.93289545517178],
-        [-60.80159345759467, -32.928744146633875]
+        [-57.94778327677554, -34.92646353616368],
+        [-57.92696933452564, -34.90717947682214],
+        [-57.90478210163817, -34.92368381431597],
+        [-57.92545351345026, -34.942226642653004]
       ]
     ]
 
-    if (!address || !pointPolygon) {
+    if (!pointPolygon) {
       throw new Error('No ingresaste una direccion o un area')
     }
 
     const geocoderOptions = {
       provider: 'openstreetmap'
     }
-    const geocoder = NodeGeocoder(geocoderOptions)
+    // const geocoder = NodeGeocoder(geocoderOptions)
 
-    const geocoded = await geocoder.geocode(address)
+    // const geocoded = await geocoder.geocode(address)
 
-    if (!geocoded || geocoded.length === 0) {
-      throw new Error('No se pudo encontrar la direccion')
-    }
+    // if (!geocoded || geocoded.length === 0) {
+    //   throw new Error('No se pudo encontrar la direccion')
+    // }
 
-    const [{ longitude, latitude }] = geocoded
+    // const [{ longitude, latitude }] = geocoded
 
-    const point = turf.point([longitude, latitude])
+    // const point = turf.point([longitude, latitude])
+    // console.log('POINT', point)
 
-    const isValidAddress = turf.booleanPointInPolygon(
-      point,
+    // const isValidAddress = turf.booleanPointInPolygon(
+    //   point,
+    //   turf.multiPolygon([pointPolygon])
+    // )
+
+    const point2 = turf.point([lon, lat])
+
+    const isValidPoint = turf.booleanPointInPolygon(
+      point2,
       turf.multiPolygon([pointPolygon])
     )
 
+    console.log(isValidPoint)
+
     return res.json({
-      esta_dentro: isValidAddress,
-      message: isValidAddress
-        ? 'Se encontro la direccion dentro del area'
-        : 'La direccion no se encuentra dentro del area marcada'
+      esta_dentro: isValidPoint,
+      message: isValidPoint,
+      zone: 'La plata',
+      time: 'De 15hs a 18hs'
     })
   } catch (error) {
     console.log('ERROR when searching AREA: ', error)
